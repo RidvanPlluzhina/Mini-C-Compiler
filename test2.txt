@@ -1,0 +1,4 @@
+int a;
+float b;
+a = 4.3;       // Error: assigning float to int
+b = a + 1;
