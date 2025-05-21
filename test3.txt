@@ -1,2 +1,0 @@
-float result;
-result = 3.0 + 4.5 * 2;
