@@ -38,16 +38,17 @@ decl:
     ;
 
 assign:
-      ID '=' expr     {
-                        char* type = lookup($1);
-                        if (type == NULL) {
-                            printf("Error: Undeclared variable %s\n", $1);
-                        } else if (strcmp(type, "int") == 0 && $3 != (int)$3) {
-                            printf("Type error: assigning float to int variable %s\n", $1);
-                        } else {
-                            printf("Assignment OK: %s = %f\n", $1, $3);
-                        }
-                      }
+      ID '=' expr {
+        char* type = lookup($1);
+        if (type == NULL) {
+            printf("Error: Undeclared variable %s\n", $1);
+        } else if (strcmp(type, "int") == 0 && $3 != (int)$3) {
+            printf("Type error: assigning float to int variable %s\n", $1);
+        } else {
+            set_value($1, $3);
+            printf("Assignment OK: %s = %f\n", $1, $3);
+        }
+      }
     ;
 
 expr:
@@ -56,7 +57,7 @@ expr:
     | expr '*' expr   { $$ = $1 * $3; }
     | expr '/' expr   { $$ = $1 / $3; }
     | NUM             { $$ = $1; }
-    | ID              { $$ = 0; }
+    | ID              { $$ = get_value($1); }
     ;
 
 %%

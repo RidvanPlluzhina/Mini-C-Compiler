@@ -6,23 +6,24 @@
 %}
 
 DIGIT    [0-9]
-NUM      {DIGIT}+(\.{DIGIT}+)?
+NUM      {DIGIT}+(\.{DIGIT}+)? 
 LETTER   [a-zA-Z]
-ID       {LETTER}+
+ID       {LETTER}+ 
 
 %%
 
-"int"    {return INT_TYPE;}
-"float"  {return FLOAT_TYPE;}
-"if"|"IF" {return IF;}
-{NUM}    {yylval.value = atof(yytext); return NUM;}
-{ID}     {yylval.lexeme = strdup(yytext); return ID;}
+"//"[^\n]*     { /* ignore single-line comments */ }
+"int"          { return INT_TYPE; }
+"float"        { return FLOAT_TYPE; }
+"if"|"IF"      { return IF; }
+{NUM}          { yylval.value = atof(yytext); return NUM; }
+{ID}           { yylval.lexeme = strdup(yytext); return ID; }
 
-"+"      {return '+';}
-"-"      {return '-';}
-"*"      {return '*';}
-"/"      {return '/';}
-"="      {return '=';}
-";"      {return ';';}
-[ \t\n]  { /* ignore whitespace */ }
+"+"            { return '+'; }
+"-"            { return '-'; }
+"*"            { return '*'; }
+"/"            { return '/'; }
+"="            { return '='; }
+";"            { return ';'; }
+[ \t\n]        { /* ignore whitespace */ }
 %%

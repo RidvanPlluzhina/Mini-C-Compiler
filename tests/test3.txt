@@ -1,2 +1,3 @@
-float result;
-result = 3.0 + 4.5 * 2;
+z = 10;
+int z;
+z = 5 + 3;

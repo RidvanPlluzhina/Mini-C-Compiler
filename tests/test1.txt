@@ -1,5 +1,5 @@
 int x;
 float y;
-x = 5;
-y = x + 3.5;
-z = 4;         // Error: z not declared
+x = 4;
+y = x + 2.5;
+int x;
