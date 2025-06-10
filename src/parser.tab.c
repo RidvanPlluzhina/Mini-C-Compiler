@@ -69,15 +69,16 @@
 /* First part of user prologue.  */
 #line 1 "parser.y"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "symbol_table.h"
+#include <stdio.h>           // Standard I/O
+#include <stdlib.h>          // For memory and math functions
+#include <string.h>          // For string comparison
+#include "symbol_table.h"   // Custom symbol table interface
 
-void yyerror(const char *s);
-int yylex(void);
+// Function declarations
+void yyerror(const char *s); // Error reporting function
+int yylex(void);             // Lexical analyzer function
 
-#line 81 "parser.tab.c"
+#line 82 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -511,8 +512,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    26,    26,    27,    31,    32,    36,    37,    41,    55,
-      56,    57,    58,    59,    60
+       0,    35,    35,    36,    40,    41,    45,    46,    50,    67,
+      68,    69,    70,    71,    72
 };
 #endif
 
@@ -1080,71 +1081,74 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* decl: INT_TYPE ID  */
-#line 36 "parser.y"
-                     { insert((yyvsp[0].lexeme), "int"); }
-#line 1086 "parser.tab.c"
+#line 45 "parser.y"
+                           { insert((yyvsp[0].lexeme), "int"); }
+#line 1087 "parser.tab.c"
     break;
 
   case 7: /* decl: FLOAT_TYPE ID  */
-#line 37 "parser.y"
-                     { insert((yyvsp[0].lexeme), "float"); }
-#line 1092 "parser.tab.c"
+#line 46 "parser.y"
+                           { insert((yyvsp[0].lexeme), "float"); }
+#line 1093 "parser.tab.c"
     break;
 
   case 8: /* assign: ID '=' expr  */
-#line 41 "parser.y"
+#line 50 "parser.y"
                   {
+        // Assignment with type checking
         char* type = lookup((yyvsp[-2].lexeme));
         if (type == NULL) {
             printf("Error: Undeclared variable %s\n", (yyvsp[-2].lexeme));
         } else if (strcmp(type, "int") == 0 && (yyvsp[0].value) != (int)(yyvsp[0].value)) {
+            // Warn if assigning float to int
             printf("Type error: assigning float to int variable %s\n", (yyvsp[-2].lexeme));
         } else {
+            // Valid assignment
             set_value((yyvsp[-2].lexeme), (yyvsp[0].value));
             printf("Assignment OK: %s = %f\n", (yyvsp[-2].lexeme), (yyvsp[0].value));
         }
       }
-#line 1108 "parser.tab.c"
+#line 1112 "parser.tab.c"
     break;
 
   case 9: /* expr: expr '+' expr  */
-#line 55 "parser.y"
+#line 67 "parser.y"
                       { (yyval.value) = (yyvsp[-2].value) + (yyvsp[0].value); }
-#line 1114 "parser.tab.c"
+#line 1118 "parser.tab.c"
     break;
 
   case 10: /* expr: expr '-' expr  */
-#line 56 "parser.y"
+#line 68 "parser.y"
                       { (yyval.value) = (yyvsp[-2].value) - (yyvsp[0].value); }
-#line 1120 "parser.tab.c"
+#line 1124 "parser.tab.c"
     break;
 
   case 11: /* expr: expr '*' expr  */
-#line 57 "parser.y"
+#line 69 "parser.y"
                       { (yyval.value) = (yyvsp[-2].value) * (yyvsp[0].value); }
-#line 1126 "parser.tab.c"
+#line 1130 "parser.tab.c"
     break;
 
   case 12: /* expr: expr '/' expr  */
-#line 58 "parser.y"
+#line 70 "parser.y"
                       { (yyval.value) = (yyvsp[-2].value) / (yyvsp[0].value); }
-#line 1132 "parser.tab.c"
+#line 1136 "parser.tab.c"
     break;
 
   case 13: /* expr: NUM  */
-#line 59 "parser.y"
+#line 71 "parser.y"
                       { (yyval.value) = (yyvsp[0].value); }
-#line 1138 "parser.tab.c"
+#line 1142 "parser.tab.c"
     break;
 
   case 14: /* expr: ID  */
-#line 60 "parser.y"
+#line 72 "parser.y"
                       { (yyval.value) = get_value((yyvsp[0].lexeme)); }
-#line 1144 "parser.tab.c"
+#line 1148 "parser.tab.c"
     break;
 
 
-#line 1148 "parser.tab.c"
+#line 1152 "parser.tab.c"
 
       default: break;
     }
@@ -1337,13 +1341,15 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 63 "parser.y"
+#line 75 "parser.y"
 
 
+/* Main function: triggers parsing */
 int main() {
-    return yyparse();
+    return yyparse();  // Start parsing
 }
 
+/* Error reporting function */
 void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
