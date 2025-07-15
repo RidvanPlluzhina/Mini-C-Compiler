@@ -2,11 +2,22 @@
 A simple C subset compiler using FLEX, YACC, and C
 
 
-## 🔧 Installation & Setup Instructions
+##  Installation & Setup Instructions
 
 Follow these steps to install and run the Mini-C Compiler on a Windows system using MSYS2.
+Make sure you have the following installed:
 
-### ✅ Prerequisites
+1. Git – to clone the repository
+
+2. Flex – for lexical analysis
+
+3. Bison – for parsing
+
+4. GCC – for compilation
+
+5. Make – to automate building (can be installed via MSYS2 or Chocolatey on Windows)
+
+### Prerequisites
 
 You need the following installed:
 - [MSYS2](https://www.msys2.org/) – UNIX-like development environment for Windows
@@ -27,33 +38,26 @@ You need the following installed:
 In the **MSYS2 UCRT64 terminal**, run:
 
 ```bash
-pacman -Syu # First-time update (may require restarting MSYS2)
-pacman -S flex bison gcc git
+pacman -Syu
+pacman -S git make flex bison gcc
 ```
 
 ### 📦 Step 3: Clone the Repository
 
 ```bash
-cd ~
-git clone https://github.com/RidvanPlluzhina/Mini-C-Compiler.git
+git clone https://github.com/yourusername/Mini-C-Compiler.git
 cd Mini-C-Compiler
-```
+
 
 ### ⚙️ Step 4: Build the Compiler
 
-```bash
-flex compiler.l
-bison -d parser.y
-gcc -o my_compiler lex.yy.c parser.tab.c symbol_table.c -lm
-```
+make
+
 
 ### ▶️ Step 5: Run the Compiler
 
-Use one of the provided test files:
+make run
 
-```bash
-./my_compiler < test1.txt
-```
 
 ### 🧪 Test Files
 
