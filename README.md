@@ -25,7 +25,7 @@ You need the following installed:
 
 ---
 
-### 🛠️ Step 1: Install MSYS2
+### Step 1: Install MSYS2
 
 1. Download from [https://www.msys2.org](https://www.msys2.org)
 2. Run the installer and follow the setup
@@ -33,7 +33,7 @@ You need the following installed:
 
 ---
 
-### 🛠️ Step 2: Install Required Packages
+### Step 2: Install Required Packages
 
 In the **MSYS2 UCRT64 terminal**, run:
 
@@ -42,24 +42,24 @@ pacman -Syu
 pacman -S git make flex bison gcc
 ```
 
-### 📦 Step 3: Clone the Repository
+### Step 3: Clone the Repository
 
 ```bash
 git clone https://github.com/yourusername/Mini-C-Compiler.git
 cd Mini-C-Compiler
+```
 
-
-### ⚙️ Step 4: Build the Compiler
+### Step 4: Build the Compiler
 
 make
 
 
-### ▶️ Step 5: Run the Compiler
+### Step 5: Run the Compiler
 
 make run
 
 
-### 🧪 Test Files
+### Test Files
 
 Example test input files:
 * `test1.txt` – basic declaration and assignment
