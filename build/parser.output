@@ -1,0 +1,396 @@
+Terminals unused in grammar
+
+    IF
+    UMINUS
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: program stmt
+    2        | ε
+
+    3 stmt: decl ';'
+    4     | assign ';'
+
+    5 decl: INT_TYPE ID
+    6     | FLOAT_TYPE ID
+
+    7 assign: ID '=' expr
+
+    8 expr: expr '+' term
+    9     | expr '-' term
+   10     | term
+
+   11 term: term '*' factor
+   12     | term '/' factor
+   13     | factor
+
+   14 factor: NUM
+   15       | ID
+   16       | '(' expr ')'
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '(' (40) 16
+    ')' (41) 16
+    '*' (42) 11
+    '+' (43) 8
+    '-' (45) 9
+    '/' (47) 12
+    ';' (59) 3 4
+    '=' (61) 7
+    error (256)
+    NUM <value> (258) 14
+    ID <lexeme> (259) 5 6 7 15
+    INT_TYPE (260) 5
+    FLOAT_TYPE (261) 6
+    IF (262)
+    UMINUS (263)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (17)
+        on left: 0
+    program (18)
+        on left: 1 2
+        on right: 0 1
+    stmt (19)
+        on left: 3 4
+        on right: 1
+    decl (20)
+        on left: 5 6
+        on right: 3
+    assign (21)
+        on left: 7
+        on right: 4
+    expr <value> (22)
+        on left: 8 9 10
+        on right: 7 8 9 16
+    term <value> (23)
+        on left: 11 12 13
+        on right: 8 9 10 11 12
+    factor <value> (24)
+        on left: 14 15 16
+        on right: 11 12 13
+
+
+State 0
+
+    0 $accept: • program $end
+    1 program: • program stmt
+    2        | ε •
+
+    $default  reduce using rule 2 (program)
+
+    program  go to state 1
+
+
+State 1
+
+    0 $accept: program • $end
+    1 program: program • stmt
+    3 stmt: • decl ';'
+    4     | • assign ';'
+    5 decl: • INT_TYPE ID
+    6     | • FLOAT_TYPE ID
+    7 assign: • ID '=' expr
+
+    $end        shift, and go to state 2
+    ID          shift, and go to state 3
+    INT_TYPE    shift, and go to state 4
+    FLOAT_TYPE  shift, and go to state 5
+
+    stmt    go to state 6
+    decl    go to state 7
+    assign  go to state 8
+
+
+State 2
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 3
+
+    7 assign: ID • '=' expr
+
+    '='  shift, and go to state 9
+
+
+State 4
+
+    5 decl: INT_TYPE • ID
+
+    ID  shift, and go to state 10
+
+
+State 5
+
+    6 decl: FLOAT_TYPE • ID
+
+    ID  shift, and go to state 11
+
+
+State 6
+
+    1 program: program stmt •
+
+    $default  reduce using rule 1 (program)
+
+
+State 7
+
+    3 stmt: decl • ';'
+
+    ';'  shift, and go to state 12
+
+
+State 8
+
+    4 stmt: assign • ';'
+
+    ';'  shift, and go to state 13
+
+
+State 9
+
+    7 assign: ID '=' • expr
+    8 expr: • expr '+' term
+    9     | • expr '-' term
+   10     | • term
+   11 term: • term '*' factor
+   12     | • term '/' factor
+   13     | • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    expr    go to state 17
+    term    go to state 18
+    factor  go to state 19
+
+
+State 10
+
+    5 decl: INT_TYPE ID •
+
+    $default  reduce using rule 5 (decl)
+
+
+State 11
+
+    6 decl: FLOAT_TYPE ID •
+
+    $default  reduce using rule 6 (decl)
+
+
+State 12
+
+    3 stmt: decl ';' •
+
+    $default  reduce using rule 3 (stmt)
+
+
+State 13
+
+    4 stmt: assign ';' •
+
+    $default  reduce using rule 4 (stmt)
+
+
+State 14
+
+   14 factor: NUM •
+
+    $default  reduce using rule 14 (factor)
+
+
+State 15
+
+   15 factor: ID •
+
+    $default  reduce using rule 15 (factor)
+
+
+State 16
+
+    8 expr: • expr '+' term
+    9     | • expr '-' term
+   10     | • term
+   11 term: • term '*' factor
+   12     | • term '/' factor
+   13     | • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+   16       | '(' • expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    expr    go to state 20
+    term    go to state 18
+    factor  go to state 19
+
+
+State 17
+
+    7 assign: ID '=' expr •  [';']
+    8 expr: expr • '+' term
+    9     | expr • '-' term
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+
+    $default  reduce using rule 7 (assign)
+
+
+State 18
+
+   10 expr: term •  ['+', '-', ';', ')']
+   11 term: term • '*' factor
+   12     | term • '/' factor
+
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+
+    $default  reduce using rule 10 (expr)
+
+
+State 19
+
+   13 term: factor •
+
+    $default  reduce using rule 13 (term)
+
+
+State 20
+
+    8 expr: expr • '+' term
+    9     | expr • '-' term
+   16 factor: '(' expr • ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    ')'  shift, and go to state 25
+
+
+State 21
+
+    8 expr: expr '+' • term
+   11 term: • term '*' factor
+   12     | • term '/' factor
+   13     | • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    term    go to state 26
+    factor  go to state 19
+
+
+State 22
+
+    9 expr: expr '-' • term
+   11 term: • term '*' factor
+   12     | • term '/' factor
+   13     | • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    term    go to state 27
+    factor  go to state 19
+
+
+State 23
+
+   11 term: term '*' • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    factor  go to state 28
+
+
+State 24
+
+   12 term: term '/' • factor
+   14 factor: • NUM
+   15       | • ID
+   16       | • '(' expr ')'
+
+    NUM  shift, and go to state 14
+    ID   shift, and go to state 15
+    '('  shift, and go to state 16
+
+    factor  go to state 29
+
+
+State 25
+
+   16 factor: '(' expr ')' •
+
+    $default  reduce using rule 16 (factor)
+
+
+State 26
+
+    8 expr: expr '+' term •  ['+', '-', ';', ')']
+   11 term: term • '*' factor
+   12     | term • '/' factor
+
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+
+    $default  reduce using rule 8 (expr)
+
+
+State 27
+
+    9 expr: expr '-' term •  ['+', '-', ';', ')']
+   11 term: term • '*' factor
+   12     | term • '/' factor
+
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+
+    $default  reduce using rule 9 (expr)
+
+
+State 28
+
+   11 term: term '*' factor •
+
+    $default  reduce using rule 11 (term)
+
+
+State 29
+
+   12 term: term '/' factor •
+
+    $default  reduce using rule 12 (term)
