@@ -1,28 +1,29 @@
-#ifndef SYMBOL_TABLE_H  // Header guard to prevent multiple inclusions of this file
+#ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-// Inserts a new symbol into the symbol table.
-// Parameters:
-// - name: the name of the symbol (e.g., variable or identifier).
-// - type: the data type of the symbol (e.g., "int", "float").
+#include "typed_val.h"  // Include the single definition
+
+typedef struct entry {
+    char* name;          // Name of the symbol
+    char* type;          // Type ("int", "float")
+    union {
+        int int_val;
+        float float_val;
+    } value;
+    struct entry* next;
+} Entry;
+
+typedef struct Scope {
+    Entry* entries;
+    struct Scope* parent;
+} Scope;
+
+// Function declarations
 void insert(char* name, char* type);
-
-// Looks up a symbol by name in the symbol table.
-// Returns:
-// - the type of the symbol if found; otherwise, NULL.
-char* lookup(char* name);
-
-// Sets the value of a symbol.
-// Parameters:
-// - name: the name of the symbol.
-// - value: the numerical value to assign to the symbol.
+Entry * lookup(char* name);
 void set_value(char* name, double value);
+typed_val get_value(char* name);
+void push_scope();
+void pop_scope();
 
-// Retrieves the value of a symbol.
-// Parameters:
-// - name: the name of the symbol.
-// Returns:
-// - the numerical value associated with the symbol.
-double get_value(char* name);
-
-#endif  // End of header guard
+#endif

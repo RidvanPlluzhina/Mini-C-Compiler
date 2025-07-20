@@ -1,4 +1,13 @@
-int a;
-a = 3.7;
-float a;
-a = 5.5;
+//Control Flow with If-Else
+int main() {
+    int a = 10;
+    int b = 20;
+    
+    if (a < b) {
+        return 1;  // This path should be taken
+    }
+    else {
+        return 0;
+    }
+}
+

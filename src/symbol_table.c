@@ -1,76 +1,101 @@
-#include <stdlib.h>      // For malloc and free functions
-#include <string.h>      // For string manipulation functions like strdup and strcmp
-#include <stdio.h>       // For standard I/O
-#include "symbol_table.h" // Include a header file for declarations
-
-// Define the structure for a symbol table entry
-typedef struct entry {
-    char* name;          // Name of the symbol (e.g., variable name)
-    char* type;          // Type of the symbol (e.g., "int", "float")
-    double value;        // Value associated with the symbol
-    struct entry* next;  // Pointer to the next entry in the linked list
-} Entry;
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "symbol_table.h"
 
 // Head pointer to the beginning of the linked list
-Entry* head = NULL;
+Scope* current_scope = NULL;
 
-// Function to insert a new symbol into the symbol table
+// Function to insert a new symbol into the current scope
 void insert(char* name, char* type) {
-    // Allocate memory for the new entry
     Entry* e = malloc(sizeof(Entry));
-
-    // Duplicate and assign the name and type strings
-    e->name = strdup(name);    // strdup allocates memory and copies the string
+    e->name = strdup(name);
     e->type = strdup(type);
-
-    // Initialize the value to 0.0 by default
-    e->value = 0.0;
-
-    // Insert at the beginning of the linked list
-    e->next = head;
-    head = e;
+    e->value.int_val = 0; // Initialize to 0 for int
+    e->next = current_scope->entries; // Insert at the beginning of the current scope
+    current_scope->entries = e;
 }
 
-// Function to look up the type of a symbol by its name
-char* lookup(char* name) {
-    Entry* current = head;
-
-    // Traverse the list until the symbol is found or the end is reached
-    while (current != NULL) {
-        if (strcmp(current->name, name) == 0)  // Check if names match
-            return current->type;              // Return the type if match is found
-        current = current->next;
+// Function to look up a symbol by name in the current scope and its parents
+Entry* lookup(char* name) {
+    Scope* scope = current_scope;
+    while (scope != NULL) {
+        Entry* current = scope->entries;
+        while (current != NULL) {
+            if (strcmp(current->name, name) == 0)
+                return current;  // return full entry, not just type
+            current = current->next;
+        }
+        scope = scope->parent;
     }
-
-    // Return NULL if the symbol is not found
     return NULL;
 }
 
+
 // Function to set the value of an existing symbol
 void set_value(char* name, double value) {
-    Entry* current = head;
-
-    // Traverse the list to find the matching symbol
-    while (current != NULL) {
-        if (strcmp(current->name, name) == 0) {
-            current->value = value;  // Update the value
-            return;                  // Exit once the update is done
+    Scope* scope = current_scope;
+    while (scope != NULL) {
+        Entry* current = scope->entries;
+        while (current != NULL) {
+            if (strcmp(current->name, name) == 0) {
+                if (strcmp(current->type, "int") == 0) {
+                    current->value.int_val = (int)value; // Store as int
+                } else if (strcmp(current->type, "float") == 0) {
+                    current->value.float_val = (float)value; // Store as float
+                }
+                return; // Exit once the update is done
+            }
+            current = current->next;
         }
-        current = current->next;
+        scope = scope->parent; // Move to the parent scope
     }
 }
 
 // Function to get the value of a symbol by name
-double get_value(char* name) {
-    Entry* current = head;
-
-    // Traverse the list to find the matching symbol
-    while (current != NULL) {
-        if (strcmp(current->name, name) == 0)
-            return current->value;  // Return the stored value
-        current = current->next;
+typed_val get_value(char* name) {
+    Scope* scope = current_scope;
+    typed_val result = { .val = 0.0, .type = NULL }; // Default return value
+    while (scope != NULL) {
+        Entry* current = scope->entries;
+        while (current != NULL) {
+            if (strcmp(current->name, name) == 0) {
+                if (strcmp(current->type, "int") == 0) {
+                    result.val = current->value.int_val;
+                    result.type = "int";
+                } else if (strcmp(current->type, "float") == 0) {
+                    result.val = current->value.float_val;
+                    result.type = "float";
+                }
+                return result; // Return the stored value
+            }
+            current = current->next;
+        }
+        scope = scope->parent; // Move to the parent scope
     }
+    return result; // Return default value if the symbol is not found
+}
 
-    // Return default value 0.0 if the symbol is not found
-    return 0.0;
+// Push a new scope onto the stack
+void push_scope() {
+    Scope* new_scope = malloc(sizeof(Scope));
+    new_scope->entries = NULL; // Initialize the new scope's entries
+    new_scope->parent = current_scope; // Set the current scope as the parent
+    current_scope = new_scope; // Update the current scope
+}
+
+// Pop the current scope from the stack
+void pop_scope() {
+    Scope* old_scope = current_scope;
+    current_scope = current_scope->parent; // Restore the previous scope
+    // Free the old scope's entries
+    Entry* current = old_scope->entries;
+    while (current != NULL) {
+        Entry* temp = current;
+        current = current->next;
+        free(temp->name);
+        free(temp->type);
+        free(temp);
+    }
+    free(old_scope); // Free the old scope itself
 }

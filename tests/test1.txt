@@ -1,5 +1,9 @@
-int x;
-float y;
-x = 4;
-y = x + 2.5;
-int x;
+int main() {
+    // Basic variable declarations and arithmetic
+    int x = 10;
+    int y = 5;
+    int z = x + y * 2;
+    
+    // Output the result
+    return z;
+}

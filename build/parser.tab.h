@@ -59,7 +59,8 @@ extern int yydebug;
     INT_TYPE = 260,                /* INT_TYPE  */
     FLOAT_TYPE = 261,              /* FLOAT_TYPE  */
     IF = 262,                      /* IF  */
-    UMINUS = 263                   /* UMINUS  */
+    WHILE = 263,                   /* WHILE  */
+    UMINUS = 264                   /* UMINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -68,12 +69,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 11 "src/parser.y"
+#line 15 "src/parser.y"
 
-  char* lexeme;
-  double value;
+    char* lexeme;
+    double value;
+    typed_val typed_val; 
 
-#line 77 "build/parser.tab.h"
+#line 79 "build/parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

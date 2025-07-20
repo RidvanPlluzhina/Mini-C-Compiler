@@ -1,6 +1,33 @@
 # Mini-C-Compiler
 A simple C subset compiler using FLEX, YACC, and C
 
+## Description 
+I created a Makefile to run and automate the building of the compiler doing all the steps. I also removed shift/reduce conflict plus added the typed_val.h to store the value and the type of expression and lookup that.
+Also implemented scope blocks via a scope stack using:
+    - push_scope() – adds a new local scope
+    - pop_scope() – removes a local scope and frees memory
+
+
+## src 
+1. compiler.l — Lexical Analyzer (Flex Input)
+Defines token patterns (keywords, identifiers, numbers, operators) for the Mini-C language. It breaks the input source code into meaningful tokens.
+Purpose: Lexical analysis — the first step of compilation.
+Why needed: Without it, the compiler can't recognize or categorize input symbols.
+
+2. parser.y — Parser (Bison Input)
+Specifies grammar rules and semantic actions for the Mini-C language. Handles syntax parsing, symbol management, and basic type checking.
+Purpose: Syntactic and semantic analysis — the second compilation phase.
+Why needed: Ensures code is structurally correct and performs actions like type checks and variable handling.
+
+3. symbol_table.c/.h — Symbol Table Implementation & Interface
+Manages declared variables: their names, types, values, and scope levels. Supports insertion, lookup, and value management.
+Purpose: Tracks identifiers and enforces semantic rules.
+Why needed: Essential for variable declaration, type safety, and scoping.
+
+4. typed_val.h — Typed Value Struct
+Defines a structure to hold both a value and its type ("int" or "float").
+Purpose: Helps with expression evaluation and type consistency.
+Why needed: Enables mixed-type operations and simple type checking during parsing.
 
 ##  Installation & Setup Instructions
 
@@ -62,14 +89,10 @@ make run
 ### Test Files
 
 Example test input files:
-* `test1.txt` – basic declaration and assignment
-* `test2.txt` – type mismatch example
-* `test3.txt` – float expressions
-* `test4.txt` – arithmetic test
-* `test5.txt` – undeclared variable test
+* `test1.txt` – Basic variable declarations and arithmetic
+* `test2.txt` – Control Flow with If-Else
+* `test3.txt` – Corrected variable declaration order
+* `test4.txt` – Test different variable types
+* `test5.txt` – Basic Looping 
 
-### 💡 Notes
 
-* This compiler supports `int` and `float` types
-* Type checking and symbol table management are included
-* Errors are shown for undeclared variables or type mismatches

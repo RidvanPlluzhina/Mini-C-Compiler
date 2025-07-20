@@ -1,4 +1,11 @@
-int m;
-int n;
-m = 5;
-n = m + 2;
+int main() {
+    // Test different variable types
+    int x = 10;
+    float y = 3.14;
+    char c = 'A';
+    
+    // Mixed expressions
+    float result = x * y + 1;
+    
+    return (int)result;  // Should return 32
+}

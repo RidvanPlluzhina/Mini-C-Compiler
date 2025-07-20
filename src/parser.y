@@ -1,34 +1,40 @@
 %{
+
+#include "typed_val.h"
+#include "symbol_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "symbol_table.h"
+
 
 void yyerror(const char *s);
 int yylex(void);
-%}
 
+
+%}
 %union {
-  char* lexeme;
-  double value;
+    char* lexeme;
+    double value;
+    typed_val typed_val; 
 }
 
 /* Tokens */
 %token <value> NUM
 %token <lexeme> ID
-%token INT_TYPE FLOAT_TYPE IF
+%token INT_TYPE FLOAT_TYPE IF WHILE
 
-/* Operator precedence (FIX FOR CONFLICTS) */
+/* Operator precedence */
 %left '+' '-'
 %left '*' '/'
 %nonassoc UMINUS
 
-/* Non-terminals */
-%type <value> expr term factor
+/* Non-terminals - ONLY type those that return values */
+%type <typed_val> expr term factor  // Expressions return values
+/* stmt/stmt_list DON'T need types - removed %type */
 
 %start program
 
-%%
+%% 
 
 program:
     program stmt
@@ -38,6 +44,14 @@ program:
 stmt:
     decl ';'
     | assign ';'
+    | IF '(' expr ')' stmt
+    | WHILE '(' expr ')' stmt
+    | '{' { push_scope(); } stmt_list '}' { pop_scope(); }
+    ;
+
+stmt_list:
+    stmt stmt_list
+    | /* empty */   // No warning now - no type expected
     ;
 
 decl:
@@ -59,38 +73,60 @@ decl:
 
 assign:
     ID '=' expr {
-        char* type = lookup($1);
-        if (!type) {
+        Entry* entry = lookup($1);  // Use the full symbol table entry
+        if (!entry) {
             printf("Error: Undeclared variable %s\n", $1);
-        } else if (strcmp(type, "int") == 0 && $3 != (int)$3) {
+        } else if (strcmp(entry->type, "int") == 0 && strcmp($3.type, "float") == 0) {
             printf("Warning: Implicit float-to-int conversion for %s\n", $1);
-            set_value($1, (int)$3);
+            entry->value.int_val = (int)$3.val;
+        } else if (strcmp(entry->type, $3.type) != 0) {
+            printf("Error: Type mismatch in assignment for %s\n", $1);
         } else {
-            set_value($1, $3);
+            if (strcmp(entry->type, "int") == 0)
+                entry->value.int_val = (int)$3.val;
+            else if (strcmp(entry->type, "float") == 0)
+                entry->value.float_val = (float)$3.val;
         }
     }
     ;
 
-/* Hierarchical expressions (FIX FOR CONFLICTS) */
 expr:
-    expr '+' term { $$ = $1 + $3; }
-    | expr '-' term { $$ = $1 - $3; }
-    | term { $$ = $1; }
+    expr '+' term { 
+        $$ = (typed_val){ .val = $1.val + $3.val, .type = "float" }; 
+    }
+    | expr '-' term { 
+        $$ = (typed_val){ .val = $1.val - $3.val, .type = "float" }; 
+    }
+    | term { 
+        $$ = $1; 
+    }
     ;
 
 term:
-    term '*' factor { $$ = $1 * $3; }
-    | term '/' factor { $$ = $1 / $3; }
-    | factor { $$ = $1; }
+    term '*' factor { 
+        $$ = (typed_val){ .val = $1.val * $3.val, .type = "float" }; 
+    }
+    | term '/' factor { 
+        $$ = (typed_val){ .val = $1.val / $3.val, .type = "float" }; 
+    }
+    | factor { 
+        $$ = $1; 
+    }
     ;
 
 factor:
-    NUM { $$ = $1; }
-    | ID { $$ = get_value($1); }
-    | '(' expr ')' { $$ = $2; }
+    NUM { 
+        $$ = (typed_val){ .val = $1, .type = "float" }; 
+    }
+    | ID { 
+        $$ = get_value($1); 
+    }
+    | '(' expr ')' { 
+        $$ = $2; 
+    }
     ;
 
-%%
+%% 
 
 int main() {
     return yyparse();

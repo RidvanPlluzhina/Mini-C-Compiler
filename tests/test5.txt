@@ -1,3 +1,13 @@
-float res;
-res = 4.5 * 2.0;
-res = 9.0 / 2.0;
+//Basic Looping 
+int main() {
+    int sum = 0;
+    int i = 0;
+    
+    // Test while loop
+    while (i < 5) {
+        sum = sum + i;
+        i = i + 1;
+    }
+    
+    return sum;  // Should return 10 (0+1+2+3+4)
+}

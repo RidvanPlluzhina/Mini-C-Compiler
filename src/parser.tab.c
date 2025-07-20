@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "src/parser.y"
+#line 1 "parser.y"
 
 
 #include "typed_val.h"
@@ -82,7 +82,7 @@ int yylex(void);
 
 
 
-#line 86 "build/parser.tab.c"
+#line 86 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -105,7 +105,61 @@ int yylex(void);
 #  endif
 # endif
 
-#include "parser.tab.h"
+
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    NUM = 258,                     /* NUM  */
+    ID = 259,                      /* ID  */
+    INT_TYPE = 260,                /* INT_TYPE  */
+    FLOAT_TYPE = 261,              /* FLOAT_TYPE  */
+    IF = 262,                      /* IF  */
+    WHILE = 263,                   /* WHILE  */
+    UMINUS = 264                   /* UMINUS  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+union YYSTYPE
+{
+#line 15 "parser.y"
+
+    char* lexeme;
+    double value;
+    typed_val typed_val; 
+
+#line 148 "parser.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+extern YYSTYPE yylval;
+
+
+int yyparse (void);
+
+
+
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -527,8 +581,8 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    40,    40,    41,    45,    46,    47,    48,    49,    49,
-      53,    54,    58,    65,    75,    91,    94,    97,   103,   106,
-     109,   115,   118,   121
+      53,    54,    58,    65,    75,    94,    97,   100,   106,   109,
+     112,   118,   121,   124
 };
 #endif
 
@@ -1111,19 +1165,19 @@ yyreduce:
   switch (yyn)
     {
   case 8: /* $@1: %empty  */
-#line 49 "src/parser.y"
+#line 49 "parser.y"
           { push_scope(); }
-#line 1117 "build/parser.tab.c"
+#line 1171 "parser.tab.c"
     break;
 
   case 9: /* stmt: '{' $@1 stmt_list '}'  */
-#line 49 "src/parser.y"
+#line 49 "parser.y"
                                           { pop_scope(); }
-#line 1123 "build/parser.tab.c"
+#line 1177 "parser.tab.c"
     break;
 
   case 12: /* decl: INT_TYPE ID  */
-#line 58 "src/parser.y"
+#line 58 "parser.y"
                 {
         if (lookup((yyvsp[0].lexeme))) {
             printf("Error: Variable %s already declared\n", (yyvsp[0].lexeme));
@@ -1131,11 +1185,11 @@ yyreduce:
             insert((yyvsp[0].lexeme), "int");
         }
     }
-#line 1135 "build/parser.tab.c"
+#line 1189 "parser.tab.c"
     break;
 
   case 13: /* decl: FLOAT_TYPE ID  */
-#line 65 "src/parser.y"
+#line 65 "parser.y"
                     {
         if (lookup((yyvsp[0].lexeme))) {
             printf("Error: Variable %s already declared\n", (yyvsp[0].lexeme));
@@ -1143,101 +1197,104 @@ yyreduce:
             insert((yyvsp[0].lexeme), "float");
         }
     }
-#line 1147 "build/parser.tab.c"
+#line 1201 "parser.tab.c"
     break;
 
   case 14: /* assign: ID '=' expr  */
-#line 75 "src/parser.y"
+#line 75 "parser.y"
                 {
-        char* type = lookup((yyvsp[-2].lexeme));
-        if (!type) {
+        Entry* entry = lookup((yyvsp[-2].lexeme));  // Use the full symbol table entry
+        if (!entry) {
             printf("Error: Undeclared variable %s\n", (yyvsp[-2].lexeme));
-        } else if (strcmp(type, "int") == 0 && strcmp((yyvsp[0].typed_val).type, "float") == 0) {
+        } else if (strcmp(entry->type, "int") == 0 && strcmp((yyvsp[0].typed_val).type, "float") == 0) {
             printf("Warning: Implicit float-to-int conversion for %s\n", (yyvsp[-2].lexeme));
-            set_value((yyvsp[-2].lexeme), (int)(yyvsp[0].typed_val).val);
-        } else if (strcmp(type, (yyvsp[0].typed_val).type) != 0) {
+            entry->value.int_val = (int)(yyvsp[0].typed_val).val;
+        } else if (strcmp(entry->type, (yyvsp[0].typed_val).type) != 0) {
             printf("Error: Type mismatch in assignment for %s\n", (yyvsp[-2].lexeme));
         } else {
-            set_value((yyvsp[-2].lexeme), (yyvsp[0].typed_val).val);
+            if (strcmp(entry->type, "int") == 0)
+                entry->value.int_val = (int)(yyvsp[0].typed_val).val;
+            else if (strcmp(entry->type, "float") == 0)
+                entry->value.float_val = (float)(yyvsp[0].typed_val).val;
         }
     }
-#line 1165 "build/parser.tab.c"
+#line 1222 "parser.tab.c"
     break;
 
   case 15: /* expr: expr '+' term  */
-#line 91 "src/parser.y"
+#line 94 "parser.y"
                   { 
         (yyval.typed_val) = (typed_val){ .val = (yyvsp[-2].typed_val).val + (yyvsp[0].typed_val).val, .type = "float" }; 
     }
-#line 1173 "build/parser.tab.c"
+#line 1230 "parser.tab.c"
     break;
 
   case 16: /* expr: expr '-' term  */
-#line 94 "src/parser.y"
+#line 97 "parser.y"
                     { 
         (yyval.typed_val) = (typed_val){ .val = (yyvsp[-2].typed_val).val - (yyvsp[0].typed_val).val, .type = "float" }; 
     }
-#line 1181 "build/parser.tab.c"
+#line 1238 "parser.tab.c"
     break;
 
   case 17: /* expr: term  */
-#line 97 "src/parser.y"
+#line 100 "parser.y"
            { 
         (yyval.typed_val) = (yyvsp[0].typed_val); 
     }
-#line 1189 "build/parser.tab.c"
+#line 1246 "parser.tab.c"
     break;
 
   case 18: /* term: term '*' factor  */
-#line 103 "src/parser.y"
+#line 106 "parser.y"
                     { 
         (yyval.typed_val) = (typed_val){ .val = (yyvsp[-2].typed_val).val * (yyvsp[0].typed_val).val, .type = "float" }; 
     }
-#line 1197 "build/parser.tab.c"
+#line 1254 "parser.tab.c"
     break;
 
   case 19: /* term: term '/' factor  */
-#line 106 "src/parser.y"
+#line 109 "parser.y"
                       { 
         (yyval.typed_val) = (typed_val){ .val = (yyvsp[-2].typed_val).val / (yyvsp[0].typed_val).val, .type = "float" }; 
     }
-#line 1205 "build/parser.tab.c"
+#line 1262 "parser.tab.c"
     break;
 
   case 20: /* term: factor  */
-#line 109 "src/parser.y"
+#line 112 "parser.y"
              { 
         (yyval.typed_val) = (yyvsp[0].typed_val); 
     }
-#line 1213 "build/parser.tab.c"
+#line 1270 "parser.tab.c"
     break;
 
   case 21: /* factor: NUM  */
-#line 115 "src/parser.y"
+#line 118 "parser.y"
         { 
         (yyval.typed_val) = (typed_val){ .val = (yyvsp[0].value), .type = "float" }; 
     }
-#line 1221 "build/parser.tab.c"
+#line 1278 "parser.tab.c"
     break;
 
   case 22: /* factor: ID  */
-#line 118 "src/parser.y"
+#line 121 "parser.y"
          { 
         (yyval.typed_val) = get_value((yyvsp[0].lexeme)); 
     }
-#line 1229 "build/parser.tab.c"
+#line 1286 "parser.tab.c"
     break;
 
   case 23: /* factor: '(' expr ')'  */
-#line 121 "src/parser.y"
+#line 124 "parser.y"
                    { 
         (yyval.typed_val) = (yyvsp[-1].typed_val); 
     }
-#line 1237 "build/parser.tab.c"
+#line 1294 "parser.tab.c"
     break;
 
 
-#line 1241 "build/parser.tab.c"
+#line 1298 "parser.tab.c"
 
       default: break;
     }
@@ -1430,7 +1487,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 126 "src/parser.y"
+#line 129 "parser.y"
  
 
 int main() {
